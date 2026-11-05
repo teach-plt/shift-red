@@ -85,15 +85,15 @@
 </main>
 <script>
 "use strict";
-const DEFAULT_GRAMMAR = `a. S ::= S "+" F;
-b. S ::= F;
-c. F ::= F "*" A;
-d. F ::= A;
-e. A ::= "x";
-f. A ::= "y";
-g. A ::= "z";
-h. A ::= "(" S ")";`;
-const DEFAULT_INPUT = 'x+y*(x+y)*z';
+const DEFAULT_GRAMMAR = `p. S ::= S "+" F;
+m. F ::= F "*" A;
+x. A ::= "x";
+y. A ::= "y";
+z. A ::= "z";
+f. S ::= F;
+a. F ::= A;
+s. A ::= "(" S ")";`;
+const DEFAULT_INPUT = 'x+y*(x+y)+z';
 const $ = id => document.getElementById(id);
 let game = null;
 
