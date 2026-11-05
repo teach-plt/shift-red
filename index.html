@@ -67,22 +67,20 @@
 </head>
 <body>
 <main>
-  <header><div><h1>shift<span>-red</span></h1><p>A little playground for shift-reduce parsing.</p></div><div class="badge">ONE STACK. ONE RULE AT A TIME.</div></header>
+  <header><div><h1>shift<span>-red</span></h1></div><div class="badge">Play shift-reduce parsing.</div></header>
   <section class="game" aria-label="Shift-reduce parsing game">
     <div class="panels">
-      <section class="rule-panel" aria-label="Grammar rules"><div class="panel-head rule-head"><span>LABELS</span><span>RULES</span></div><div class="scroll" id="rules"></div></section>
+      <section class="rule-panel" aria-label="Grammar rules"><div class="panel-head rule-head"><span>LABEL</span><span>RULE</span></div><div class="scroll" id="rules"></div></section>
       <section style="min-width:0" aria-label="Parsing history"><div class="panel-head state-head"><span>STATE</span><span>ACTION</span></div><div class="scroll" id="states"><div class="trace" id="trace"></div></div></section>
     </div>
-    <div class="input-area"><div class="input-caption"><label for="user-input">USER-INPUT</label><span class="status" id="status" role="status" aria-live="polite"></span></div><input id="user-input" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="action-help" placeholder="Type . to shift, or a label to reduce" disabled></div>
+    <div class="input-area"><div class="input-caption"><label for="user-input">ACTIONS</label><span class="status" id="status" role="status" aria-live="polite"></span></div><input id="user-input" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="action-help" placeholder="Type . to shift, or a label to reduce" disabled></div>
   </section>
-  <div class="help" id="action-help"><span><kbd>.</kbd> shift a token</span><span><kbd>label</kbd> reduce a rule</span><span><kbd>⌫</kbd> undo · grey rows keep your future</span></div>
   <section class="setup" aria-label="Game setup">
-    <button id="save" type="button">SAVE ↗</button><div class="field"><label for="url">URL</label><input id="url" readonly placeholder="Save a link to this exact position" spellcheck="false"></div>
+    <button id="save" type="button">SAVE ↗</button><div class="field"><label for="url">&nbsp;</label><input id="url" readonly placeholder="Save a link to this exact position" spellcheck="false"></div>
     <button id="start" class="primary" type="button">START</button><div class="field"><label for="input">INPUT</label><input id="input" autocomplete="off" spellcheck="false"></div>
     <button id="clear" type="button">CLEAR</button><div class="field"><label for="grammar">LBNF GRAMMAR</label><textarea id="grammar" spellcheck="false" aria-describedby="grammar-help"></textarea></div>
   </section>
   <p class="notice" id="notice" role="status" aria-live="polite"></p>
-  <footer><span id="grammar-help">Labelled LBNF productions · quoted terminals · whitespace between tokens is ignored.</span><span>All parsing happens in your browser.</span></footer>
 </main>
 <script>
 "use strict";
@@ -236,7 +234,7 @@ function render() {
   });
   $('trace').replaceChildren(fragment);
   const accepted = !active.error && active.offset === game.tokens.length && active.stack.length === 1 && active.stack[0].kind === 'category' && active.stack[0].value === game.grammar.start;
-  $('status').textContent = active.error ? active.error : accepted ? 'Accepted · parse complete' : `${active.offset} / ${game.tokens.length} tokens shifted`;
+  $('status').textContent = active.error ? active.error : accepted ? 'Accepted · parse complete' : `${active.offset} / ${game.tokens.length} shifted`;
   $('status').className = 'status' + (accepted ? ' accepted' : '');
   $('user-input').setAttribute('aria-invalid',String(!!active.error));
   // Scroll vertically to the current row without moving the page or horizontal view.
