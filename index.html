@@ -266,7 +266,24 @@ function start(grammarSource, input, current = '', played = current) {
   } catch (error) { $('notice').textContent = error.message; return false; }
 }
 $('user-input').addEventListener('input', () => {
-  game.current = $('user-input').value;
+  const field = $('user-input'), value = field.value;
+  let expanded = '', selectionStart = field.selectionStart, selectionEnd = field.selectionEnd;
+  for (let i = 0; i < value.length; i++) {
+    let replacement = value[i];
+    if (replacement === ' ') {
+      const state = replay(expanded, game).states.at(-1);
+      const rule = game.grammar.rules.find(rule => canReduce(state, rule));
+      if (rule) replacement = rule.label;
+    }
+    expanded += replacement;
+    if (i < field.selectionStart) selectionStart += replacement.length - 1;
+    if (i < field.selectionEnd) selectionEnd += replacement.length - 1;
+  }
+  if (expanded !== value) {
+    field.value = expanded;
+    field.setSelectionRange(selectionStart, selectionEnd);
+  }
+  game.current = field.value;
   if (!game.played.startsWith(game.current)) game.played = game.current;
   $('url').value = ''; render();
 });
