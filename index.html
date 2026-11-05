@@ -27,6 +27,7 @@
   .rule-row { display:grid; grid-template-columns:74px 1fr; min-height:38px; align-items:stretch; width:max-content; min-width:100%; font:15px/38px var(--mono); }
   .rule-label { color:var(--red); padding:0 18px; border-right:1px solid #efede7; overflow-wrap:anywhere; line-height:38px; }
   .rule-text { padding:0 18px; white-space:pre; }
+  .rule-row.unavailable .rule-label,.rule-row.unavailable .rule-text { color:#b4b0aa; }
   .trace { width:max-content; min-width:100%; }
   .state-row { display:grid; grid-template-columns:minmax(0,1fr) 85px; min-height:38px; font:15px/38px var(--mono); }
   .state-content { display:flex; padding:0 18px 0 10px; white-space:pre; }
@@ -166,6 +167,15 @@ function tokenize(input, grammar) {
   return result;
 }
 
+function canReduce(state, rule) {
+  if (state.error || state.stack.length < rule.rhs.length) return false;
+  const offset = state.stack.length - rule.rhs.length;
+  return rule.rhs.every((symbol,index) => {
+    const top = state.stack[offset + index];
+    return top.kind === symbol.kind && top.value === symbol.value;
+  });
+}
+
 function replay(actions, model) {
   const states = [{stack:[], offset:0, position:0}], transitions = [];
   let i = 0;
@@ -184,8 +194,7 @@ function replay(actions, model) {
       if (!rule) { error = `Unknown action at character ${i + 1}: “${actions.slice(i)}”.`; action = '✗'; end = actions.length; }
       else {
         action = rule.label; end = i + rule.label.length;
-        const top = stack.slice(stack.length - rule.rhs.length);
-        if (stack.length < rule.rhs.length || rule.rhs.some((s,j) => top[j].kind !== s.kind || top[j].value !== s.value)) error = `Cannot reduce ${rule.label}: the stack must end with ${rule.rhs.map(s => s.value).join(' ') || 'ε'}.`;
+        if (!canReduce(prev, rule)) error = `Cannot reduce ${rule.label}: the stack must end with ${rule.rhs.map(s => s.value).join(' ') || 'ε'}.`;
         else { stack = stack.slice(0, stack.length - rule.rhs.length); stack.push({kind:'category',value:rule.lhs,text:rule.lhs}); }
       }
     }
@@ -209,6 +218,9 @@ function render() {
   const current = replay(game.current, game), complete = replay(game.played, game);
   const states = current.states.slice(), transitions = current.transitions.slice();
   const activeIndex = states.length - 1, active = states[activeIndex];
+  game.grammar.rules.forEach((rule,index) => {
+    $('rules').children[index].className = 'rule-row' + (canReduce(active, rule) ? '' : ' unavailable');
+  });
   // Only extend from an actual action boundary. Partial labels remain errors.
   if (!active.error && game.played.startsWith(game.current) && complete.states[activeIndex]?.position === game.current.length) {
     states.push(...complete.states.slice(activeIndex + 1));
