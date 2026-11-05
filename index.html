@@ -306,7 +306,11 @@ const input = params.get('input') ?? DEFAULT_INPUT;
 const actions = params.get('user-input') ?? params.get('userInput') ?? params.get('actions') ?? '';
 const played = params.get('played') ?? actions;
 $('grammar').value = source; $('input').value = input;
-start(source,input,actions,played);
+if (start(source,input,actions,played)) {
+  const field = $('user-input');
+  field.focus();
+  field.setSelectionRange(field.value.length, field.value.length);
+}
 </script>
 </body>
 </html>
